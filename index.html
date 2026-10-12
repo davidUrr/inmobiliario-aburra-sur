@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Inteligencia Inmobiliaria Aburrá Sur</title>
+  <meta name="description" content="Demostrador de tableros del sector inmobiliario de la jurisdicción de la Cámara de Comercio Aburrá Sur.">
+  <link rel="icon" type="image/png" href="assets/ccas_isotipo_color.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Raleway:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/ccas-tablero.tokens.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="encabezado">
+    <div class="encabezado-inner">
+      <img class="logo" src="assets/ccas_logo_negativo.png" alt="Cámara de Comercio Aburrá Sur">
+      <span class="sep" aria-hidden="true"></span>
+      <div class="titulo">
+        <h1>Inteligencia Inmobiliaria · Aburrá Sur</h1>
+        <p>Envigado · Itagüí · Sabaneta · La Estrella · Caldas</p>
+      </div>
+      <div class="selector-tablero" role="tablist" aria-label="Tablero">
+        <button role="tab" data-tablero="observatorio">Observatorio sectorial</button>
+        <button role="tab" data-tablero="radiografia">Radiografía empresarial</button>
+      </div>
+      <button class="btn-tema" id="btnTema" title="Cambiar tema claro/oscuro" aria-label="Cambiar tema claro/oscuro">◐</button>
+    </div>
+  </header>
+
+  <nav class="subnav" aria-label="Secciones"><div class="subnav-inner" id="subnav"></div></nav>
+
+  <main id="vista" tabindex="-1"></main>
+
+  <footer class="pie">
+    <span>Demostrador · datos públicos y licenciados procesados con el ETL del Tablero Inmobiliario (La Lonja). Cifras sujetas a validación.</span>
+    <span><a href="guia-marca.html">Sistema visual</a> · <span id="pieFecha"></span></span>
+  </footer>
+
+  <script src="vendor/echarts.min.js"></script>
+  <script src="data/geo.js"></script>
+  <script src="data/datos.js"></script>
+  <script src="app.js"></script>
+  <script src="observatorio.js"></script>
+  <script src="radiografia.js"></script>
+  <script>App.iniciar();</script>
+</body>
+</html>
