@@ -13,7 +13,8 @@ Tres niveles, en este orden. Los dos primeros se repiten cada vez que se actuali
 ## Nivel 1 · Técnico (automático)
 
 ```
-python validacion/verificar_interfaz.py
+python validacion/verificar_interfaz.py                      # copia local
+python validacion/verificar_interfaz.py https://davidurr.github.io/inmobiliario-aburra-sur/   # sitio publicado
 ```
 Abre las 8 vistas en Chrome en modo claro, oscuro y celular (390 px). Revisa errores de consola,
 textos inválidos («NaN», «undefined») y desborde horizontal. También prueba los filtros, la búsqueda,
@@ -90,6 +91,7 @@ Criterios de aceptación sugeridos:
 | Fecha | Nivel | Responsable | Resultado | Ajustes |
 |---|---|---|---|---|
 | 2026-10-12 | 1 | Automático | Sin fallas (24 vistas + 5 flujos) | Corregido desborde en Metodología a 390 px |
+| 2026-10-12 | 1 | Automático (sitio publicado) | Sin fallas en https://davidurr.github.io/inmobiliario-aburra-sur/ | — |
 | 2026-10-12 | 2a | Automático | 36/38; 2 alertas de la base de origen | Duplicados EMIS de Caldas documentados |
 | | 2b | | | |
 | | 3 | | | |

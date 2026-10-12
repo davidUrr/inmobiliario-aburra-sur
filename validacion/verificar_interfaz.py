@@ -3,14 +3,15 @@ detecta errores de consola y textos inválidos (NaN, undefined), prueba filtros,
 ranking -> ficha y comparador, y guarda capturas en validacion/capturas/.
 
 Requisitos: pip install playwright  (usa el Chrome instalado; no descarga navegadores)
-Uso: python validacion/verificar_interfaz.py
+Uso: python validacion/verificar_interfaz.py [url publicada]
 """
 import sys
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 RAIZ = Path(__file__).resolve().parent.parent
-URL = (RAIZ / "web" / "index.html").as_uri()
+# sin argumento prueba la copia local; con argumento, una URL publicada (p. ej. GitHub Pages)
+URL = sys.argv[1].rstrip("/") + "/index.html" if len(sys.argv) > 1 else (RAIZ / "web" / "index.html").as_uri()
 SAL = RAIZ / "validacion" / "capturas"
 SAL.mkdir(parents=True, exist_ok=True)
 CHROME = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
