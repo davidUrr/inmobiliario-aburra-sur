@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sistema visual CCAS</title>
+  <meta name="description" content="Guía del sistema visual reutilizable para tableros de la Cámara de Comercio Aburrá Sur.">
+  <link rel="icon" type="image/png" href="assets/ccas_isotipo_color.png">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Raleway:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/ccas-tablero.tokens.css">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .muestras { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+    .muestra { border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; background: var(--surface); }
+    .muestra .c { height: 64px; }
+    .muestra div:last-child { padding: 8px 10px; font-size: var(--fs-xs); color: var(--text-2); }
+    .muestra b { display: block; color: var(--text); font-size: var(--fs-sm); }
+    .logos { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+    .logos figure { margin: 0; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 22px; display: grid; place-items: center; min-height: 130px; }
+    .logos figure img { max-width: 100%; max-height: 64px; }
+    .logos figcaption { font-size: var(--fs-xs); color: var(--text-3); margin-top: 10px; }
+    .tipo p { margin: 6px 0; }
+    .regla { font-size: var(--fs-sm); color: var(--text-2); }
+    .regla li { margin-bottom: 6px; }
+  </style>
+</head>
+<body>
+  <header class="encabezado"><div class="encabezado-inner">
+    <img class="logo" src="assets/ccas_logo_negativo.png" alt="Cámara de Comercio Aburrá Sur">
+    <span class="sep" aria-hidden="true"></span>
+    <div class="titulo"><h1>Sistema visual para tableros</h1><p>Recursos reutilizables · web y Power BI · v1.0</p></div>
+    <a class="btn sec" href="index.html" style="text-decoration:none">Ir al tablero</a>
+  </div></header>
+  <main>
+    <div class="grid">
+      <section class="card c12"><h3>1 · Logotipo</h3>
+        <p class="sub">Archivo publicado en ccas.org.co. El negativo y el isotipo se derivaron sin redibujar ni alterar proporciones; reemplazar por los oficiales cuando Comunicaciones los entregue.</p>
+        <div class="logos" style="margin-top:12px">
+          <figure style="background:#fff"><img src="assets/ccas_logo_color.png" alt="Logotipo a color"><figcaption>Color · fondos claros</figcaption></figure>
+          <figure style="background:#004FA3"><img src="assets/ccas_logo_negativo.png" alt="Logotipo negativo"><figcaption style="color:#fff">Negativo · encabezados azules</figcaption></figure>
+          <figure style="background:#fff"><img src="assets/ccas_isotipo_color.png" alt="Isotipo"><figcaption>Isotipo · favicon y espacios reducidos</figcaption></figure>
+        </div>
+        <ul class="regla" style="margin-top:12px"><li>Altura mínima en pantalla: 32 px para el logotipo completo, 24 px para el isotipo.</li>
+          <li>Espacio libre alrededor: al menos la altura de la letra «C» del logotipo.</li><li>No recolorear parcialmente, no deformar, no aplicar sombras.</li></ul>
+      </section>
+      <section class="card c12"><h3>2 · Colores de identidad</h3><p class="sub">Tomados de la hoja de estilos del sitio oficial (tema «ccas»). Para interfaz, nunca para series de datos.</p>
+        <div class="muestras" style="margin-top:12px" id="identidad"></div></section>
+      <section class="card c12"><h3>3 · Colores de datos</h3>
+        <p class="sub">Derivados de los azules institucionales y validados para daltonismo (ΔE adyacente ≥ 10), luminosidad, croma y contraste, en claro y oscuro. Orden fijo: el color sigue al municipio.</p>
+        <div class="muestras" style="margin-top:12px" id="datos"></div>
+        <p class="sub" style="margin-top:14px"><b>Secuencial</b> (magnitud, mapas)</p><div class="muestras" id="seq" style="grid-template-columns:repeat(6,1fr)"></div>
+        <p class="sub" style="margin-top:14px"><b>Estados</b> (reservados; siempre con ícono y texto)</p>
+        <p><span class="badge ok">● Bueno</span> <span class="badge alerta">▲ Alerta</span> <span class="badge critico">■ Crítico</span> <span class="badge neutro">○ Neutro</span></p></section>
+      <section class="card c6 tipo"><h3>4 · Tipografía</h3><p class="sub">Las del sitio oficial. En Power BI se usa Segoe UI para garantizar la visualización en el servicio web.</p>
+        <p style="font:800 34px/1.1 var(--font-titulos)">Montserrat 800</p><p style="font:700 22px var(--font-titulos)">Montserrat 700 · títulos y cifras</p>
+        <p style="font:400 16px var(--font-texto)">Raleway 400 · textos, etiquetas y notas de fuente.</p>
+        <p class="sub">Escala: 12 · 13 · 15 · 18 · 24 · 34 px</p></section>
+      <section class="card c6"><h3>5 · Componentes</h3><p class="sub">Los mismos del tablero, en <code>styles.css</code>.</p>
+        <div class="grid" style="margin-top:12px">
+          <div class="card kpi c6"><span class="etq">Indicador</span><span class="valor">53.676</span><span class="contexto"><span class="delta down">▼ 12,5 %</span> vs. año anterior</span></div>
+          <div class="c6" style="display:grid;gap:10px;align-content:start"><div class="chips"><button class="chip" aria-pressed="true">Aburrá Sur</button><button class="chip" aria-pressed="false"><i class="punto" style="background:var(--serie-1)"></i>Envigado</button></div>
+            <div><button class="btn">Acción principal</button> <button class="btn sec">Secundaria</button></div></div>
+          <div class="c12 nota">Nota metodológica o aviso de cobertura de la fuente.</div>
+        </div></section>
+      <section class="card c12"><h3>6 · Reglas de uso en gráficos</h3><ul class="regla">
+        <li>Un solo eje vertical por gráfico; dos medidas de escalas distintas van en gráficos separados.</li>
+        <li>Para más de 6 categorías, agrupar el resto en «Otros» (gris de referencia).</li>
+        <li>Al filtrar, el elemento elegido conserva su color y los demás pasan a gris; nunca se recolorean.</li>
+        <li>El ámbar (La Estrella) tiene contraste &lt; 3:1 sobre blanco: siempre con etiqueta o leyenda visible.</li>
+        <li>Toda visualización lleva título, unidad, periodo y fuente.</li></ul></section>
+    </div>
+  </main>
+  <script>
+    const v = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+    const pinta = (id, items) => document.getElementById(id).innerHTML = items.map(([n, t, d]) =>
+      `<div class="muestra"><div class="c" style="background:var(${t})"></div><div><b>${n}</b>${v(t)}${d ? " · " + d : ""}</div></div>`).join("");
+    pinta("identidad", [["Azul institucional", "--ccas-azul", "encabezados"], ["Azul profundo", "--ccas-azul-profundo", "hover, portada"],
+      ["Cian", "--ccas-cian", "acento, líneas"], ["Índigo logotipo", "--ccas-indigo-logo", "solo logo"], ["Fondo", "--bg", "lienzo"],
+      ["Borde", "--border", "tarjetas"], ["Tinta", "--text", "texto"], ["Tinta secundaria", "--text-2", "subtítulos"]]);
+    pinta("datos", [["1 · Envigado", "--serie-1"], ["2 · Itagüí", "--serie-2"], ["3 · Sabaneta", "--serie-3"], ["4 · La Estrella", "--serie-4"],
+      ["5 · Caldas", "--serie-5"], ["6 · Extra", "--serie-6"], ["Referencia", "--serie-ref"]]);
+    pinta("seq", [1, 2, 3, 4, 5, 6].map(i => [String(i), `--seq-${i}`]));
+  </script>
+</body>
+</html>

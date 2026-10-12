@@ -1,0 +1,100 @@
+/* =============================================================================
+   Sistema visual de tableros · Cámara de Comercio Aburrá Sur (CCAS)
+   v1.0 · 12-10-2026
+
+   Identidad: valores tomados del sitio oficial ccas.org.co (hoja de estilos del
+   tema "ccas" y logotipo publicado), consultado el 12-10-2026:
+     azul institucional #004FA3 · azul oscuro #003C7D / #003670 · cian #25C0EC
+     índigo del logotipo #333C91 · tinta #202A32 · grises #53616E #748594
+     fondos #EEF4FA #DEE7EF · tipografías Raleway y Montserrat.
+   No es el manual oficial: al recibirlo de Comunicaciones, cambiar solo los
+   valores de esta capa; los roles se conservan.
+
+   Datos: paleta categórica derivada y validada (luminosidad, croma, daltonismo,
+   contraste) en claro y oscuro. Ver SISTEMA_VISUAL.md.
+   ============================================================================= */
+
+:root {
+  color-scheme: light;
+
+  /* --- Identidad (interfaz) --- */
+  --ccas-azul: #004FA3;
+  --ccas-azul-hover: #003C7D;
+  --ccas-azul-profundo: #003670;
+  --ccas-cian: #25C0EC;
+  --ccas-indigo-logo: #333C91;
+
+  /* --- Superficies y texto --- */
+  --bg: #EEF4FA;
+  --surface: #FFFFFF;
+  --surface-2: #F6F9FC;
+  --border: #DEE7EF;
+  --border-strong: #C7D4DF;
+  --text: #202A32;
+  --text-2: #53616E;
+  --text-3: #6B7B8A;
+  --grid: #E6EDF3;
+  --header-bg: var(--ccas-azul);
+  --header-text: #FFFFFF;
+  --accent: var(--ccas-azul);
+  --accent-soft: #E3EEFA;
+  --focus: #0B63C5;
+
+  /* --- Datos: categórica (orden fijo; el color sigue a la entidad) --- */
+  --serie-1: #1F6FD1;  /* Envigado    · azul   */
+  --serie-2: #E8743B;  /* Itagüí      · naranja */
+  --serie-3: #0FA38C;  /* Sabaneta    · verde agua */
+  --serie-4: #D99A00;  /* La Estrella · ámbar (contraste < 3:1: requiere etiqueta) */
+  --serie-5: #C2508F;  /* Caldas      · magenta */
+  --serie-6: #6A5ACD;  /* 6.ª serie   · violeta */
+  --serie-ref: #8C99A6; /* referencia (Medellín, mediana de pares) */
+
+  /* --- Datos: secuencial (un tono, claro → oscuro) --- */
+  --seq-1: #D6E6F8; --seq-2: #A9CBF0; --seq-3: #6FA6E4; --seq-4: #2F78D2; --seq-5: #0B4F9E; --seq-6: #06336A;
+
+  /* --- Datos: divergente --- */
+  --div-neg: #E8743B; --div-mid: #E9EDF1; --div-pos: #1F6FD1;
+
+  /* --- Estados (reservados; siempre con ícono o texto) --- */
+  --ok: #18794E;      --ok-bg: #E6F4EC;
+  --alerta: #8A5A00;  --alerta-bg: #FFF4D6;
+  --critico: #B42318; --critico-bg: #FDECEA;
+
+  /* --- Tipografía --- */
+  --font-titulos: "Montserrat", "Segoe UI", Arial, sans-serif;
+  --font-texto: "Raleway", "Segoe UI", Arial, sans-serif;
+  --fs-xs: 12px; --fs-sm: 13px; --fs-md: 15px; --fs-lg: 18px; --fs-xl: 24px; --fs-hero: 34px;
+
+  /* --- Espaciado, radios, sombras --- */
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 20px; --sp-6: 24px; --sp-8: 32px;
+  --radius: 10px; --radius-sm: 6px;
+  --shadow: 0 1px 2px rgb(16 42 74 / 6%), 0 4px 14px rgb(16 42 74 / 6%);
+}
+
+/* Modo oscuro: pasos propios validados contra la superficie oscura */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0C1726; --surface: #13233A; --surface-2: #182B45;
+    --border: #22385A; --border-strong: #2E4A72;
+    --text: #EAF1F8; --text-2: #B4C2D1; --text-3: #8FA0B3; --grid: #1F3352;
+    --header-bg: #062F63; --accent: #6FB0FF; --accent-soft: #1B3558; --focus: #7DB8FF;
+    --serie-1: #4A8FE8; --serie-2: #DE6A30; --serie-3: #14A890; --serie-4: #BE8200; --serie-5: #D2649E; --serie-6: #8B7FE0; --serie-ref: #7F8EA0;
+    --seq-1: #1A3355; --seq-2: #1E4C86; --seq-3: #2A68B8; --seq-4: #4A8FE8; --seq-5: #86B6F2; --seq-6: #C4DCFA;
+    --div-mid: #2A3B52;
+    --ok: #5CC891; --ok-bg: #12352A; --alerta: #F0BE4A; --alerta-bg: #3A2E10; --critico: #FF8A80; --critico-bg: #3D1A1A;
+    --shadow: 0 1px 2px rgb(0 0 0 / 30%);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0C1726; --surface: #13233A; --surface-2: #182B45;
+  --border: #22385A; --border-strong: #2E4A72;
+  --text: #EAF1F8; --text-2: #B4C2D1; --text-3: #8FA0B3; --grid: #1F3352;
+  --header-bg: #062F63; --accent: #6FB0FF; --accent-soft: #1B3558; --focus: #7DB8FF;
+  --serie-1: #4A8FE8; --serie-2: #DE6A30; --serie-3: #14A890; --serie-4: #BE8200; --serie-5: #D2649E; --serie-6: #8B7FE0; --serie-ref: #7F8EA0;
+  --seq-1: #1A3355; --seq-2: #1E4C86; --seq-3: #2A68B8; --seq-4: #4A8FE8; --seq-5: #86B6F2; --seq-6: #C4DCFA;
+  --div-mid: #2A3B52;
+  --ok: #5CC891; --ok-bg: #12352A; --alerta: #F0BE4A; --alerta-bg: #3A2E10; --critico: #FF8A80; --critico-bg: #3D1A1A;
+  --shadow: 0 1px 2px rgb(0 0 0 / 30%);
+}
