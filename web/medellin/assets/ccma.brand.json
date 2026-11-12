@@ -1,0 +1,235 @@
+{
+  "name": "Cámara de Comercio de Medellín para Antioquia",
+  "short_name": "Cámara de Comercio de Medellín",
+  "key": "ccma",
+  "version": "1.0.0",
+  "consulted_on": "2026-11-09",
+  "status": "Kit de trabajo para el proyecto; no constituye aprobación institucional",
+  "sources": [
+    {
+      "id": "manual_usuario",
+      "url": "https://es.scribd.com/document/936443145/CCMA-Manual-RGB-2025-compressed-2",
+      "hosting": "Scribd, enlace proporcionado por el usuario",
+      "pages_used": [
+        6,
+        7,
+        9,
+        10,
+        20,
+        22,
+        26,
+        28,
+        29,
+        50
+      ],
+      "verification": "Lectura pública y revisión de las muestras gráficas RGB de las páginas 20 y 22; tamaño mínimo en página 9."
+    },
+    {
+      "id": "sitio_oficial",
+      "url": "https://www.camaramedellin.com.co/",
+      "css": "https://www.camaramedellin.com.co/Portals/0/skins/ccma/css/base.css?cdv=224",
+      "verification": "Descarga de HTML, CSS y recursos originales del dominio institucional."
+    },
+    {
+      "id": "powerbi",
+      "url": "https://learn.microsoft.com/en-us/power-bi/create-reports/report-themes-create-custom"
+    }
+  ],
+  "colors": {
+    "primary": {
+      "rojo": {
+        "hex": "#E31F26",
+        "rgb": [
+          227,
+          31,
+          38
+        ]
+      },
+      "gris": {
+        "hex": "#BDBDBD",
+        "rgb": [
+          189,
+          189,
+          189
+        ]
+      },
+      "negro": {
+        "hex": "#000000",
+        "rgb": [
+          0,
+          0,
+          0
+        ]
+      }
+    },
+    "complementary": {
+      "gris_oscuro": {
+        "hex": "#636363",
+        "rgb": [
+          99,
+          99,
+          99
+        ]
+      },
+      "purpura": {
+        "hex": "#712B90",
+        "rgb": [
+          113,
+          43,
+          144
+        ]
+      },
+      "verde": {
+        "hex": "#80BC00",
+        "rgb": [
+          128,
+          188,
+          0
+        ]
+      },
+      "azul": {
+        "hex": "#0071CE",
+        "rgb": [
+          0,
+          113,
+          206
+        ]
+      },
+      "cyan": {
+        "hex": "#34B6E4",
+        "rgb": [
+          52,
+          182,
+          228
+        ]
+      },
+      "azul_tierra": {
+        "hex": "#005171",
+        "rgb": [
+          0,
+          81,
+          113
+        ]
+      },
+      "verdeazul": {
+        "hex": "#007D87",
+        "rgb": [
+          0,
+          125,
+          135
+        ]
+      },
+      "amarillo": {
+        "hex": "#FFB60F",
+        "rgb": [
+          255,
+          182,
+          15
+        ]
+      },
+      "naranja": {
+        "hex": "#FF603B",
+        "rgb": [
+          255,
+          96,
+          59
+        ]
+      }
+    },
+    "white": {
+      "hex": "#FFFFFF",
+      "rgb": [
+        255,
+        255,
+        255
+      ]
+    },
+    "source_primary": {
+      "id": "manual_usuario",
+      "page": 20
+    },
+    "source_complementary": {
+      "id": "manual_usuario",
+      "page": 22
+    },
+    "website_interface": {
+      "red": "#E31F26",
+      "gray": "#3D3D3D",
+      "font": "Lato"
+    },
+    "application_proposal": {
+      "background": "#F2F2F2",
+      "surface": "#FFFFFF",
+      "text": "#000000",
+      "text_secondary": "#636363",
+      "border": "#DEDEDE",
+      "header": "#FFFFFF",
+      "brand_accent": "#E31F26",
+      "link": "#005171",
+      "focus": "#005171",
+      "positive": "#517A00",
+      "neutral": "#636363",
+      "negative": "#E31F26",
+      "sidebar": "#3D3D3D",
+      "sidebar_text": "#FFFFFF"
+    }
+  },
+  "typography": {
+    "brand_primary": "Montserrat",
+    "short_highlight_reference": "Didot",
+    "website_observed": "Lato",
+    "dashboard_recommended": "Montserrat",
+    "dashboard_compatibility": "Segoe UI",
+    "weights_packaged": [
+      400,
+      700
+    ],
+    "fonts_installed_by_this_kit": false,
+    "note": "Montserrat es principal en el manual y en su apartado web; la CSS de la web consultada usa Lato. Didot se conserva como referencia y no se usa en tablas ni KPI."
+  },
+  "data_palette": {
+    "colors": [
+      "#0071CE",
+      "#712B90",
+      "#636363",
+      "#007D87",
+      "#005171",
+      "#517A00"
+    ],
+    "status": "Aplicación propuesta para analítica",
+    "derived_colors": {
+      "#517A00": "Verde oscurecido para contraste, no valor corporativo del manual."
+    },
+    "red_reserved_for_negative_data": true,
+    "chart_default": "#0071CE",
+    "reference": "#636363",
+    "requires_labels": true,
+    "cluster_palette_mixed": false
+  },
+  "logo": {
+    "primary": "assets/ccma_logo_principal_original.png",
+    "negative": "assets/ccma_logo_footer_original.png",
+    "menu_symbol": "assets/ccma_icono_menu_original.svg",
+    "source_urls": {
+      "primary": "https://www.camaramedellin.com.co/Portals/0/CCMA-Logo.png?ver=q3u3b5fFMd4Vlysfmt19hA%3d%3d",
+      "negative": "https://www.camaramedellin.com.co/portals/0/skins/ccma/images/logo_footer-ccma.png",
+      "menu_symbol": "https://www.camaramedellin.com.co/Portals/0/skins/ccma/images/iconos/icon-ccma.svg"
+    },
+    "digital_minimum_width_px": 180,
+    "minimum_source_page": 9,
+    "preserve_aspect_ratio": true,
+    "assets_altered": false,
+    "limitation": "El PNG principal publicado mide 141 × 56 px; solicitar el original vectorial para producción ampliada. No se redibujó el logotipo ni el eslogan."
+  },
+  "powerbi": {
+    "recommended": "powerbi/Tema_CCMA_Montserrat.json",
+    "compatibility": "powerbi/Tema_CCMA_Compatible.json",
+    "native_import_verified": false,
+    "note": "Los temas no sustituyen colores y tipografías fijados directamente en visuales del informe anterior."
+  },
+  "contract_data": {
+    "loaded": false,
+    "source_file": null,
+    "note": "El kit no incorpora registros de CCAS como si pertenecieran a Medellín."
+  }
+}
