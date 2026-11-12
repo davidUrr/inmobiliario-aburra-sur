@@ -1,4 +1,4 @@
-/* Tablero 1 · Observatorio sectorial inmobiliario (rediseño de los paneles del Tablero Lonja para Aburrá Sur). */
+/* Tablero 1 · Observatorio sectorial inmobiliario (rediseño de los paneles del Tablero Lonja para Jurisdicción CCMA). */
 (function () {
   const { D, MUNI, NOMBRE, GEO, estado, t, colorMunicipio, fmt, est, grafico, baseEjes, ejeCat, ejeVal, leyenda,
     tooltipFila, $, $$, esc, card, kpi, filtroMunicipio, descargarCSV } = App;
@@ -64,15 +64,15 @@
     const ingA = est.suma(emp.map(e => A(e, anioFin)?.ingresos));
     const pan = panel(emp, anioFin);
     const activas = rues(), renovadas = rues(r => r.ultimo_renovado === anioRenovMax);
-    const nombreSel = estado.municipio === "todos" ? "Aburrá Sur" : NOMBRE[estado.municipio];
+    const nombreSel = estado.municipio === "todos" ? "Jurisdicción CCMA" : NOMBRE[estado.municipio];
 
     vista.insertAdjacentHTML("beforeend", `<div class="grid">
       ${kpi({ etq: `Transacciones inmobiliarias ${anio}`, valor: fmt.n(act.transacciones), contexto: `${nombreSel} · ${fmt.delta(act.transacciones, prev.transacciones)}` })}
       ${kpi({ etq: `Valor transado ${anio}`, valor: fmt.cop(act.valor), contexto: `${nombreSel} · ${fmt.delta(act.valor, prev.valor)}` })}
-      ${kpi({ etq: "Empresas activas del sector", valor: fmt.n(activas), contexto: `Registro de la Cámara · ${fmt.pct(renovadas / activas * 100, 0)} renovó en ${anioRenovMax}` })}
+      ${kpi({ etq: "Registro sectorial · jurisdicción completa", valor: fmt.n(activas), contexto: `No cambia con el municipio · ${fmt.pct(renovadas / activas * 100, 0)} renovó en ${anioRenovMax}` })}
       ${kpi({ etq: `Ingresos operacionales ${anioFin}`, valor: fmt.cop(ingA), contexto: `${emp.filter(e => A(e, anioFin)).length} empresas · ${fmt.delta(pan.act, pan.prev, `mismas ${pan.n} empresas que en ${anioFin - 1}`)}` })}
-      ${card({ id: "mapa", titulo: `Transacciones por cada 1.000 habitantes, ${anio}`, sub: "Haz clic en un municipio para filtrar el tablero. Medellín se muestra como referencia.", fuente: `${F.igac}; ${F.mapa}`, cls: "c7", alto: "alto" })}
-      ${card({ id: "msj", titulo: "Mensajes clave", sub: "Lectura automática a partir de los datos filtrados", cls: "c5", cuerpo: `<ul class="mensajes" id="mensajes"></ul>` })}
+      ${card({ id: "mapa", titulo: `Transacciones por cada 1.000 habitantes, ${anio}`, sub: "Haz clic para filtrar. Usa la rueda o los controles para acercar el mapa.", fuente: `${F.igac}; ${F.mapa}`, cls: "c7", alto: "alto" })}
+      ${card({ id: "msj", titulo: "Lectura de la jurisdicción", sub: "Comparación de toda la jurisdicción CCMA; los KPI superiores siguen el municipio", cls: "c5", cuerpo: `<ul class="mensajes" id="mensajes"></ul>` })}
       ${card({ id: "tabla", titulo: "Comparativo municipal", sub: `Año ${anio} para mercado inmobiliario; ${anioFin} para empresas`, fuente: `${F.igac}; ${F.emis}; ${F.mapa}`, cls: "c12",
         acciones: `<button class="btn sec no-print" id="csvMun">Descargar CSV</button>`, cuerpo: `<div class="tabla-wrap" id="tablaMun"></div>` })}
     </div>`);
@@ -87,6 +87,7 @@
         predios_nuevos: a.nuevos, empresas_emis: e.length, ingresos_mm: est.suma(e.map(x => A(x, anioFin)?.ingresos)) };
     });
 
+    filas.sort((a,b)=>b.transacciones-a.transacciones);
     // mapa
     const k = t();
     const valores = filas.map(f => f.por_mil);
@@ -101,9 +102,9 @@
         inRange: { color: k.seq.slice(0, 5) }, left: 8, bottom: 8, itemHeight: 110, text: ["más", "menos"],
         textStyle: { color: k.text2, fontSize: 11 }, calculable: false, seriesIndex: 0 },
       series: [{
-        type: "map", map: "aburra", roam: false, aspectScale: 0.97, center: [-75.615, 6.115], zoom: 1.85,
+        type: "map", map: "ccma", roam: true, aspectScale: 0.97, zoom: 1,
         selectedMode: false,
-        label: { show: true, fontFamily: k.fontT, fontSize: 12, fontWeight: 700, color: k.text,
+        label: { show: false, fontFamily: k.fontT, fontSize: 12, fontWeight: 700, color: k.text,
           textBorderColor: k.surface, textBorderWidth: 3, formatter: p => p.name },
         itemStyle: { borderColor: k.surface, borderWidth: 1.5, areaColor: k.grid },
         emphasis: { label: { color: k.text }, itemStyle: { areaColor: k.accent, opacity: 0.85 } },
@@ -111,7 +112,7 @@
           ...filas.map(f => ({ name: f.municipio, value: f.por_mil,
             label: { offset: { "La Estrella": [-34, 4], "Sabaneta": [8, 10], "Envigado": [14, -6] }[f.municipio] || [0, 0] },
             itemStyle: estado.municipio !== "todos" && estado.municipio !== f.cod ? { opacity: 0.35 } : {} })),
-          { name: "Medellín", value: null, itemStyle: { areaColor: k.grid, borderColor: k.border }, label: { color: k.text3 } },
+
         ],
       }],
     }).on("click", p => {
@@ -135,7 +136,7 @@
       ["2", `<strong>${intenso.municipio}</strong> tiene el mercado más activo por habitante`, `${fmt.n(intenso.por_mil, 0)} transacciones por cada 1.000 habitantes, frente a ${fmt.n(totAS / poblacion(MUNI.map(m => m.cod)) * 1000, 0)} en la jurisdicción.`],
       ["3", `El valor promedio por transacción más alto está en <strong>${caro.municipio}</strong>`, `${fmt.cop(caro.promedio_mm)} por transacción en ${anio}.`],
       anual.length ? ["4", `Mayor variación anual: <strong>${anual[0].m.nombre}</strong> (${anual[0].v >= 0 ? "+" : ""}${fmt.pct(anual[0].v * 100, 1)})`, `Menor: ${anual[anual.length - 1].m.nombre} (${anual[anual.length - 1].v >= 0 ? "+" : ""}${fmt.pct(anual[anual.length - 1].v * 100, 1)}) frente a ${anio - 1}.`] : null,
-      ["5", `Las 5 empresas más grandes generan el <strong>${fmt.pct(top5, 0)}</strong> de los ingresos`, `Sobre ${conteoEMIS[anioFin]} empresas con estados financieros en ${anioFin}.`],
+      ["5", `Las 5 empresas más grandes generan el <strong>${fmt.pct(top5, 0)}</strong> de los ingresos`, `Sobre la muestra de ${conteoEMIS[anioFin]} empresas con estados financieros en ${anioFin}.`],
       ["6", `<strong>${fmt.pct(sanas, 0)}</strong> de las empresas tiene salud financiera buena o excelente`, `Índice de salud 0–100 (rentabilidad, liquidez, endeudamiento y margen), ${anioFin}.`],
     ].filter(Boolean);
     $("#mensajes").innerHTML = msj.map(([i, a, b]) => `<li><span class="ico">${i}</span><div>${a}<p>${b}</p></div></li>`).join("");
@@ -176,74 +177,38 @@
       .sort((a, b) => b.value - a.value).map(p => tooltipFila(p.color, p.seriesName, formato(p.value))).join("");
   }
   function mercado(vista) {
-    const fm = filtroMunicipio(() => App.rerender());
-    cabecera(vista, "Mercado inmobiliario",
-      "Transacciones, intensidad del mercado, valores y composición de actos jurídicos sobre inmuebles en cada municipio.",
-      fm.html + selectorAnio("anioMer", aniosIGAC, anioIGAC.valor));
-    const anio = anioIGAC.valor, k = t();
-    const leyMun = (ref) => leyenda([...MUNI.map(m => ({ nombre: m.nombre, color: colorMunicipio(m.cod), linea: true })),
-      ...(ref ? [{ nombre: "Medellín (referencia)", color: k.ref, linea: true, ref: true }] : [])]);
-    vista.insertAdjacentHTML("beforeend", `<div class="grid">
-      ${card({ id: "gTrans", titulo: "Transacciones inmobiliarias por año", sub: `Número de transacciones, ${aniosDin[0]}–${aniosDin.at(-1)}`, fuente: F.dinamica, cls: "c6",
-        cuerpo: `<div class="chart" id="gTrans" role="img" aria-label="Transacciones por año"></div>${leyMun(false)}` })}
-      ${card({ id: "gInt", titulo: "Índice de intensidad de la dinámica inmobiliaria", sub: `Nivel básico del índice IGAC; más alto = mercado más activo respecto a su parque de inmuebles. Referencia Medellín ${aniosDin.at(-1)}: ${fmt.n(D.dinamica.find(d => d.cod === "05001" && d.anio === aniosDin.at(-1) && d.zona === "Total")?.intensidad, 3)}`, fuente: F.dinamica, cls: "c6",
-        cuerpo: `<div class="chart" id="gInt" role="img" aria-label="Índice de intensidad"></div>${leyMun(false)}` })}
-      ${card({ id: "gProm", titulo: `Valor promedio por transacción, ${anio}`, sub: "Millones de pesos por transacción registrada con valor", fuente: F.igac, cls: "c6" })}
-      ${card({ id: "gNuevos", titulo: "Folios de matrícula nuevos por año", sub: "Aproximación a la incorporación de nuevos predios (nueva oferta)", fuente: F.igac, cls: "c6",
-        cuerpo: `<div class="chart" id="gNuevos" role="img" aria-label="Folios nuevos"></div>${leyMun(false).replaceAll("linea", "")}` })}
-      ${card({ id: "gActos", titulo: `Composición de las transacciones por tipo de acto, ${anio}`, sub: "Participación de cada acto jurídico en el total del municipio", fuente: F.igac, cls: "c12", alto: "" })}
+    const fm=filtroMunicipio(()=>App.rerender()), k=t(), cods=sel(), anio=anioIGAC.valor;
+    const titulo=estado.municipio==='todos'?'Jurisdicción CCMA':NOMBRE[estado.municipio];
+    cabecera(vista,'Mercado inmobiliario','Evolución y composición de las operaciones registradas. Los valores corresponden al periodo indicado por la fuente.',fm.html+selectorAnio('anioMer',aniosIGAC,anio));
+    const totals=(source,year,field)=>{const rows=source.filter(r=>cods.includes(r.cod)&&r.anio===year);return rows.length?est.suma(rows.map(r=>r[field])):null;};
+    const lista=MUNI.map(m=>({m,a:igacAnio([m.cod],anio)})).filter(x=>x.a.transacciones>0).sort((a,b)=>b.a.transacciones-a.a.transacciones).slice(0,10).reverse();
+    const ranking=estado.municipio==='todos'?lista:lista.filter(x=>x.m.cod===estado.municipio);
+    const actos=D.igac.actos.filter(r=>cods.includes(r.cod)&&r.anio===anio), agrupados={};
+    actos.forEach(r=>agrupados[r.acto]=(agrupados[r.acto]||0)+r.transacciones);
+    const nombres=Object.keys(agrupados).sort((a,b)=>agrupados[b]-agrupados[a]);
+    vista.insertAdjacentHTML('beforeend',`<div class="grid">
+      ${card({id:'gTrans',titulo:'Transacciones inmobiliarias por año',sub:titulo,fuente:F.dinamica,cls:'c6'})}
+      ${card({id:'gInt',titulo:'Intensidad de la dinámica inmobiliaria',sub:'Índice básico ponderado por el parque de inmuebles de la selección',fuente:F.dinamica,cls:'c6'})}
+      ${card({id:'gProm',titulo:estado.municipio==='todos'?`10 municipios con más transacciones, ${anio}`:`Transacciones en ${titulo}, ${anio}`,sub:'Volumen registrado; no equivale a compraventas de vivienda',fuente:F.igac,cls:'c6',alto:'alto'})}
+      ${card({id:'gNuevos',titulo:'Folios de matrícula nuevos',sub:titulo+' · aproximación a nuevos predios',fuente:F.igac,cls:'c6',alto:'alto'})}
+      ${card({id:'gActos',titulo:`Actos jurídicos registrados, ${anio}`,sub:titulo,fuente:F.igac,cls:'c12',alto:'alto'})}
     </div>`);
-    fm.enlazar(vista);
-    $("#anioMer").addEventListener("change", e => { anioIGAC.valor = +e.target.value; App.rerender(); });
-
-    grafico($("#gTrans"), { ...baseEjes(), tooltip: { ...baseEjes().tooltip, formatter: tooltipLineas(v => fmt.n(v)) },
-      xAxis: ejeCat(aniosDin), yAxis: ejeVal({ axisLabel: { color: k.text3, formatter: v => fmt.n(v / 1000) + " mil" } }),
-      series: serieMunicipios("transacciones") });
-    grafico($("#gInt"), { ...baseEjes(), tooltip: { ...baseEjes().tooltip, formatter: tooltipLineas(v => fmt.n(v, 3)) },
-      xAxis: ejeCat(aniosDin), yAxis: ejeVal(), series: serieMunicipios("intensidad") });
-
-    const filas = MUNI.map(m => { const a = igacAnio([m.cod], anio); return { m, v: a.transacciones ? a.valor / a.transacciones : 0 }; })
-      .sort((a, b) => a.v - b.v);
-    grafico($("#gProm"), { ...baseEjes(), tooltip: { ...baseEjes().tooltip, trigger: "item", formatter: p => tooltipFila(p.color, p.name, fmt.cop(p.value)) },
-      grid: { left: 8, right: 70, top: 8, bottom: 8, containLabel: true },
-      xAxis: ejeVal({ axisLabel: { show: false } }), yAxis: ejeCat(filas.map(f => f.m.nombre)),
-      series: [{ type: "bar", barWidth: 18, data: filas.map(f => ({ value: f.v,
-        itemStyle: { color: estado.municipio === "todos" || estado.municipio === f.m.cod ? colorMunicipio(f.m.cod) : k.border, borderRadius: [0, 4, 4, 0] } })),
-        label: { show: true, position: "right", color: k.text, fontSize: 11, formatter: p => fmt.n(p.value, 0) + " M" } }] });
-
-    const aniosN = [...new Set(D.igac.anual.map(a => a.anio))].sort();
-    grafico($("#gNuevos"), { ...baseEjes(), tooltip: { ...baseEjes().tooltip, axisPointer: { type: "shadow" },
-      formatter: ps => `<b>${ps[0].axisValue}</b>` + ps.filter(p => p.value).map(p => tooltipFila(p.color, p.seriesName, fmt.n(p.value))).join("") },
-      xAxis: ejeCat(aniosN), yAxis: ejeVal(),
-      series: sel().map(cod => ({ name: NOMBRE[cod], type: "bar", stack: "n", barWidth: "60%",
-        itemStyle: { color: colorMunicipio(cod), borderColor: k.surface, borderWidth: 1 },
-        data: aniosN.map(a => D.igac.anual.find(x => x.cod === cod && x.anio === a)?.predios_nuevos || 0) })) });
-
-    // actos: 100 % apilado por municipio
-    const actos = [...new Set(D.igac.actos.map(a => a.acto))];
-    const orden = actos.filter(a => a !== "Otros actos").sort((a, b) =>
-      est.suma(D.igac.actos.filter(x => x.acto === b).map(x => x.transacciones)) - est.suma(D.igac.actos.filter(x => x.acto === a).map(x => x.transacciones)));
-    orden.push("Otros actos");
-    const mun = sel();
-    const tot = Object.fromEntries(mun.map(c => [c, est.suma(D.igac.actos.filter(x => x.cod === c && x.anio === anio).map(x => x.transacciones))]));
-    const corto = s => s.replace("Transferencia de dominio a título de ", "Transferencia: ").replace(/\s+/g, " ").replace(/^(.{46}).+$/, "$1…");
-    grafico($("#gActos"), { ...baseEjes(),
-      tooltip: { ...baseEjes().tooltip, axisPointer: { type: "shadow" }, formatter: ps => `<b>${ps[0].axisValue}</b>` +
-        ps.map(p => tooltipFila(p.color, corto(p.seriesName), fmt.pct(p.value, 1))).join("") },
-      legend: { bottom: 0, left: 0, icon: "roundRect", itemWidth: 10, itemHeight: 10, textStyle: { color: k.text2, fontSize: 11 }, formatter: corto },
-      grid: { left: 8, right: 16, top: 8, bottom: 64, containLabel: true },
-      xAxis: ejeVal({ max: 100, axisLabel: { color: k.text3, formatter: v => v + " %" } }), yAxis: ejeCat(mun.map(c => NOMBRE[c]), { inverse: true }),
-      series: orden.map((a, i) => ({ name: a, type: "bar", stack: "t", barWidth: 22,
-        itemStyle: { color: a === "Otros actos" ? k.ref : k.series[i], borderColor: k.surface, borderWidth: 2 },
-        label: { show: true, color: "#fff", fontSize: 10, fontWeight: 700, formatter: p => p.value >= 8 ? fmt.n(p.value, 0) + "%" : "" },
-        data: mun.map(c => tot[c] ? (D.igac.actos.find(x => x.cod === c && x.anio === anio && x.acto === a)?.transacciones || 0) / tot[c] * 100 : 0) })) });
-    $("#gActos").style.height = Math.max(220, 120 + mun.length * 40) + "px";
+    fm.enlazar(vista);$('#anioMer').addEventListener('change',e=>{anioIGAC.valor=+e.target.value;App.rerender()});
+    const dyn=D.dinamica.filter(d=>d.zona==='Total');
+    grafico($('#gTrans'),{...baseEjes(),xAxis:ejeCat(aniosDin),yAxis:ejeVal(),series:[{name:titulo,type:'line',connectNulls:false,itemStyle:{color:k.series[0]},data:aniosDin.map(y=>totals(dyn,y,'transacciones'))}]});
+    grafico($('#gInt'),{...baseEjes(),xAxis:ejeCat(aniosDin),yAxis:ejeVal(),series:[{name:titulo,type:'line',itemStyle:{color:k.series[1]},data:aniosDin.map(y=>{const rows=dyn.filter(d=>cods.includes(d.cod)&&d.anio===y&&d.intensidad!=null&&d.inmuebles>0);const parque=est.suma(rows.map(d=>d.inmuebles));return parque?est.suma(rows.map(d=>d.intensidad*d.inmuebles))/parque:null;})}]});
+    const rank=estado.municipio==='todos'?ranking:MUNI.filter(m=>m.cod===estado.municipio).map(m=>({m,a:igacAnio([m.cod],anio)}));
+    grafico($('#gProm'),{...baseEjes(),grid:{left:8,right:45,top:10,bottom:10,containLabel:true},xAxis:ejeVal(),yAxis:ejeCat(rank.map(x=>x.m.nombre)),series:[{type:'bar',barMaxWidth:22,data:rank.map(x=>({value:x.a.transacciones,itemStyle:{color:colorMunicipio(x.m.cod)}})),label:{show:true,position:'right',color:k.text,formatter:p=>fmt.n(p.value)}}]});
+    const years=[...new Set(D.igac.anual.map(a=>a.anio))].sort();
+    grafico($('#gNuevos'),{...baseEjes(),xAxis:ejeCat(years),yAxis:ejeVal(),series:[{name:titulo,type:'bar',barMaxWidth:36,itemStyle:{color:k.series[3]},data:years.map(y=>totals(D.igac.anual,y,'predios_nuevos'))}]});
+    grafico($('#gActos'),{...baseEjes(),grid:{left:8,right:55,top:10,bottom:10,containLabel:true},xAxis:ejeVal(),yAxis:ejeCat([...nombres].reverse(),{axisLabel:{color:k.text2,width:260,overflow:'truncate'}}),series:[{type:'bar',barMaxWidth:26,data:[...nombres].reverse().map((n,i)=>({value:agrupados[n],itemStyle:{color:k.series[i%6]}})),label:{show:true,position:'right',color:k.text,formatter:p=>fmt.n(p.value)}}]});
   }
+
 
   // ============================================================ TEJIDO EMPRESARIAL
   function tejido(vista) {
     cabecera(vista, "Tejido empresarial del sector",
-      "Empresas con matrícula activa en la Cámara de Comercio Aburrá Sur en actividades inmobiliarias y conexas (registro mercantil).",
+      "Empresas con matrícula activa en la Cámara de Comercio de Medellín para Antioquia en actividades inmobiliarias y conexas (registro mercantil).",
       `<div class="nota">El registro mercantil se consolida para toda la jurisdicción de la Cámara; por eso esta sección no se filtra por municipio.</div>`);
     const k = t();
     const activas = rues(), renovadas = rues(r => r.ultimo_renovado === anioRenovMax);
@@ -312,25 +277,25 @@
       fm.html + selectorAnio("anioFin", aniosEMIS, anioFin));
     const k = t(), cods = sel(), emp = empresasDe(cods), a = String(anioFin), ap = String(anioFin - 1);
     const conA = emp.filter(e => A(e, a));
-    const ing = est.suma(conA.map(e => e.anios[a].ingresos)), pan = panel(emp, a);
+    const ing = conA.length ? est.suma(conA.map(e => e.anios[a].ingresos)) : null, pan = panel(emp, a);
     const margen = est.mediana(conA.map(e => e.anios[a].margen_neto));
     const perd = conA.filter(e => e.anios[a].utilidad < 0).length;
     const cuotas = conA.map(e => e.anios[a].ingresos / ing);
-    const hhi = est.suma(cuotas.map(c => c * c)) * 10000;
-    const hhiTxt = hhi < 1500 ? ["ok", "No concentrado"] : hhi < 2500 ? ["alerta", "Moderadamente concentrado"] : ["critico", "Altamente concentrado"];
+    const hhi = conA.length && ing>0 ? est.suma(cuotas.map(c => c * c)) * 10000 : null;
+    const hhiTxt = hhi == null ? ["neutro", "Sin datos"] : hhi < 1500 ? ["ok", "Menor concentración"] : hhi < 2500 ? ["alerta", "Concentración intermedia"] : ["critico", "Mayor concentración"];
 
     vista.insertAdjacentHTML("beforeend", `<div class="grid">
       ${kpi({ etq: `Ingresos operacionales ${a}`, valor: fmt.cop(ing), contexto: `${conA.length} empresas · ${fmt.delta(pan.act, pan.prev, `mismas ${pan.n} empresas que en ${ap}`)}` })}
       ${kpi({ etq: "Margen neto mediano", valor: fmt.pct(margen, 1), contexto: "La mitad de las empresas está por encima de este valor" })}
       ${kpi({ etq: "Empresas con pérdidas", valor: fmt.n(perd), contexto: `${fmt.pct(perd / Math.max(conA.length, 1) * 100, 0)} de las que reportaron en ${a}` })}
-      ${kpi({ etq: "Concentración del mercado (IHH)", valor: fmt.n(hhi), contexto: `<span class="badge ${hhiTxt[0]}">${hhiTxt[0] === "ok" ? "●" : "▲"} ${hhiTxt[1]}</span>` })}
+      ${kpi({ etq: "Concentración de la muestra (IHH)", valor: fmt.n(hhi), contexto: `<span class="badge ${hhiTxt[0]}">${hhiTxt[0] === "ok" ? "●" : "▲"} ${hhiTxt[1]}</span>` })}
       ${card({ id: "gIng", titulo: "Ingresos operacionales agregados por año", sub: "Suma de las empresas de cada municipio", fuente: F.emis, cls: "c6",
-        cuerpo: `<div class="chart" id="gIng" role="img" aria-label="Ingresos por año"></div>${leyenda(MUNI.map(m => ({ nombre: m.nombre, color: colorMunicipio(m.cod), linea: true })))}` })}
+        cuerpo: `<div class="chart" id="gIng" role="img" aria-label="Ingresos por año"></div>${leyenda([{nombre:estado.municipio==="todos"?"Jurisdicción CCMA":NOMBRE[estado.municipio],color:k.series[0],linea:true}])}` })}
       ${card({ id: "gSalud", titulo: "Salud financiera de las empresas por año", sub: "Distribución del índice de salud (0–100) por nivel", fuente: `${F.emis}; índice del Tablero Lonja`, cls: "c6",
         cuerpo: `<div class="chart" id="gSalud" role="img" aria-label="Salud financiera"></div>${leyenda(NIVELES.map((n, i) => ({ nombre: n, color: k.seq[i + 2] })))}` })}
       ${card({ id: "gTop", titulo: `Las 10 empresas con más ingresos, ${a}`, sub: "Haz clic en una barra para abrir su radiografía · etiqueta = participación en los ingresos del grupo", fuente: F.emis, cls: "c6", alto: "alto" })}
       ${card({ id: "gDisp", titulo: `Tamaño frente a rentabilidad, ${a}`, sub: "Activos totales (escala logarítmica) y margen neto; cada punto es una empresa", fuente: F.emis, cls: "c6", alto: "alto",
-        cuerpo: `<div class="chart alto" id="gDisp" role="img" aria-label="Dispersión"></div>${leyenda([{ nombre: estado.municipio === "todos" ? "Empresas de Aburrá Sur" : NOMBRE[estado.municipio], color: k.series[0] }, ...(estado.municipio === "todos" ? [] : [{ nombre: "Resto de la jurisdicción", color: k.border }])])}` })}
+        cuerpo: `<div class="chart alto" id="gDisp" role="img" aria-label="Dispersión"></div>${leyenda([{ nombre: estado.municipio === "todos" ? "Empresas de Jurisdicción CCMA" : NOMBRE[estado.municipio], color: k.series[0] }, ...(estado.municipio === "todos" ? [] : [{ nombre: "Resto de la jurisdicción", color: k.border }])])}` })}
       ${card({ id: "tTam", titulo: `Indicadores medianos por tamaño de empresa, ${a}`, sub: "Medianas: robustas frente a valores extremos", fuente: F.emis, cls: "c12", cuerpo: `<div class="tabla-wrap" id="tTam"></div>` })}
     </div>`);
     fm.enlazar(vista);
@@ -338,12 +303,7 @@
 
     grafico($("#gIng"), { ...baseEjes(), tooltip: { ...baseEjes().tooltip, formatter: tooltipLineas(v => fmt.cop(v)) },
       xAxis: ejeCat(aniosEMIS), yAxis: ejeVal({ axisLabel: { color: k.text3, formatter: v => fmt.copCorto(v) } }),
-      series: MUNI.map(m => {
-        const at = estado.municipio !== "todos" && estado.municipio !== m.cod;
-        return { name: m.nombre, type: "line", symbol: "circle", symbolSize: at ? 0 : 7, lineStyle: { width: at ? 1.5 : 2 }, z: at ? 1 : 3,
-          itemStyle: { color: at ? k.border : colorMunicipio(m.cod), borderColor: k.surface, borderWidth: 2 },
-          data: aniosEMIS.map(y => est.suma(empresasDe([m.cod]).map(e => A(e, y)?.ingresos))) };
-      }) });
+      series: [{name:estado.municipio==='todos'?'Jurisdicción CCMA':NOMBRE[estado.municipio],type:'line',symbol:'circle',itemStyle:{color:k.series[0]},data:aniosEMIS.map(y=>{const group=emp.filter(e=>A(e,y));return group.length?est.suma(group.map(e=>A(e,y).ingresos)):null;})}] });
 
     grafico($("#gSalud"), { ...baseEjes(), tooltip: { ...baseEjes().tooltip, axisPointer: { type: "shadow" },
         formatter: ps => `<b>${ps[0].axisValue}</b>` + [...ps].reverse().map(p => tooltipFila(p.color, p.seriesName, fmt.pct(p.value, 0))).join("") },
@@ -364,7 +324,7 @@
         data: top.map(e => ({ value: e.anios[a].ingresos, itemStyle: { color: colorMunicipio(e.cod), borderRadius: [0, 4, 4, 0] } })),
         label: { show: true, position: "right", color: k.text, fontSize: 11, formatter: p => fmt.pct(p.value / ing * 100, 1) } }] })
       .on("click", p => { App.estado.empresa = top[p.dataIndex].nit; App.ir("radiografia", "ficha"); });
-    $("#gTop").insertAdjacentHTML("afterend", leyenda(MUNI.map(m => ({ nombre: m.nombre, color: colorMunicipio(m.cod) }))));
+    $("#gTop").insertAdjacentHTML("afterend", leyenda([...new Set(top.map(e=>e.cod))].map(cod=>({nombre:NOMBRE[cod],color:colorMunicipio(cod)}))));
 
     const todos = D.empresas.filter(e => A(e, a)?.activos > 0 && A(e, a)?.margen_neto != null);
     const p = v => Math.max(-100, Math.min(100, v));
@@ -407,17 +367,17 @@
         <div class="paso"><b>1 · Fuentes</b>IGAC, RUES, Supersociedades/EMIS, DANE. Archivos oficiales descargados o consultas a API.</div>
         <div class="paso"><b>2 · ETL</b>El mismo proceso en Python del Tablero Lonja normaliza códigos DIVIPOLA, CIIU, NIT y unidades.</div>
         <div class="paso"><b>3 · Modelo</b>Base SQLite con tablas de staging; reglas de calidad y bitácora de cargas.</div>
-        <div class="paso"><b>4 · Exportación</b><code>etl/exportar_datos.py</code> filtra la jurisdicción y calcula cuotas, índice de salud e IHH.</div>
-        <div class="paso"><b>5 · Tableros</b>Web (este demostrador) o Power BI con el tema CCAS de <code>marca/powerbi</code>.</div></div>` })}
+        <div class="paso"><b>4 · Exportación</b><code>etl/exportar_datos.py</code> filtra la jurisdicción resuelve duplicados exactos y calcula participaciones e indicadores. Los valores contradictorios se dejan sin dato.</div>
+        <div class="paso"><b>5 · Tableros</b>Web (este demostrador), con un modelo reutilizable para Power BI y la plataforma de programas.</div></div>` })}
       ${card({ id: "cob", titulo: "Cobertura de las fuentes", cls: "c12", cuerpo: `<div class="tabla-wrap"><table class="tabla"><thead><tr><th>Componente</th><th>Fuente</th><th>Periodo</th><th>Nivel</th><th>Actualización</th></tr></thead>
         <tbody>${cob.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join("")}</tr>`).join("")}</tbody></table></div>` })}
       ${card({ id: "cal", titulo: "Notas de calidad", cls: "c6", cuerpo: `<ul class="capacidades" style="columns:1">
-        <li>Los códigos de Caldas (Antioquia) mal asignados a Caldas (Boyacá) en la fuente financiera se corrigen en la exportación.</li>
-        <li>El registro mercantil no trae municipio: se reporta para toda la jurisdicción de la Cámara (código RUES 55).</li>
+        <li>La jurisdicción se selecciona con 69 códigos DIVIPOLA. El RUES sectorial se filtra por Cámara 21; no tiene municipio en esta extracción.</li>
+        <li>El registro mercantil no trae municipio: se reporta para toda la jurisdicción de la Cámara (código RUES 21).</li>
         <li>El índice de dinámica usa el nivel «básico», el único con cobertura completa 2015–2023. En 2021 el número de inmuebles de algunos municipios cae de forma atípica en la fuente.</li>
         <li>Los valores de transacciones solo existen desde 2021; los folios nuevos, desde 2015.</li>
         <li>Solo reportan estados financieros las sociedades obligadas ante Supersociedades: las cifras no representan a todas las microempresas.</li>
-        <li>El índice de salud (0–100) reutiliza la fórmula del Tablero Lonja: rentabilidad 30, liquidez 25, endeudamiento 25 y margen 20.</li></ul>` })}
+        <li>El índice de salud es ilustrativo y solo se calcula con componentes completos: rentabilidad 30, liquidez 25, endeudamiento 25 y margen 20.</li></ul>` })}
       ${card({ id: "cap", titulo: "Capacidades que demuestra el prototipo", cls: "c6", cuerpo: `<ul class="capacidades" style="columns:1">
         <li><b>Integración de fuentes</b> públicas y licenciadas en un solo modelo, con ETL reproducible.</li>
         <li><b>Enfoque territorial</b>: filtros por municipio, mapa interactivo y comparativos per cápita.</li>
@@ -426,7 +386,7 @@
         <li><b>Lectura guiada</b>: mensajes clave generados a partir de los datos.</li>
         <li><b>Identidad institucional</b> parametrizada: el mismo sistema sirve para web y Power BI.</li>
         <li><b>Exportación</b> de tablas a CSV e impresión de fichas en PDF.</li>
-        <li><b>Accesibilidad</b>: paleta validada para daltonismo, modo oscuro y etiquetas con texto.</li></ul>` })}
+        <li><b>Lectura accesible</b>: colores con etiquetas, navegación con teclado y modo oscuro.</li></ul>` })}
     </div>`);
   }
 

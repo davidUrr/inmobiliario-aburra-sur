@@ -3,7 +3,7 @@
   const D = window.DATOS;
   const MUNI = D.meta.municipios;                       // orden fijo => color fijo
   const NOMBRE = Object.fromEntries([...MUNI, ...D.meta.contexto].map(m => [m.cod, m.nombre]));
-  const GEO = Object.fromEntries(window.GEO_ABURRA_SUR.features.map(f => [f.properties.cod, f.properties]));
+  const GEO = Object.fromEntries(window.GEO_CCMA.features.map(f => [f.properties.cod, f.properties]));
 
   const estado = { tablero: "observatorio", seccion: null, municipio: "todos", empresa: null };
   const tableros = {};       // nombre -> { titulo, secciones: [{id, titulo, render}] }
@@ -23,11 +23,11 @@
   }
   function colorMunicipio(cod) {
     const i = MUNI.findIndex(m => m.cod === cod);
-    return i >= 0 ? t().series[i] : t().ref;
+    return i >= 0 ? t().series[i % 6] : t().ref;
   }
   function aplicarTema(modo) {
     if (modo) document.documentElement.setAttribute("data-theme", modo);
-    try { if (modo) localStorage.setItem("ccas-tema", modo); } catch (e) { /* sin almacenamiento */ }
+    try { if (modo) localStorage.setItem("ccma-tema", modo); } catch (e) { /* sin almacenamiento */ }
   }
   function temaActual() {
     const a = document.documentElement.getAttribute("data-theme");
@@ -146,21 +146,15 @@
     return `<div class="card kpi ${cls}"><span class="etq">${etq}</span><span class="valor">${valor}</span><span class="contexto">${contexto}</span></div>`;
   }
   function filtroMunicipio(alCambiar, { incluirTodos = true } = {}) {
-    const op = [...(incluirTodos ? [{ cod: "todos", nombre: "Aburrá Sur" }] : []), ...MUNI];
-    const html = `<div class="filtro"><span>Municipio</span><div class="chips" role="group" aria-label="Municipio">
-      ${op.map(m => `<button class="chip" data-mun="${m.cod}" aria-pressed="${estado.municipio === m.cod}">
-        ${m.cod !== "todos" ? `<i class="punto" style="background:${colorMunicipio(m.cod)}"></i>` : ""}${m.nombre}</button>`).join("")}
-    </div></div>`;
-    const enlazar = (raiz) => $$("[data-mun]", raiz).forEach(b => b.addEventListener("click", () => {
-      estado.municipio = b.dataset.mun; alCambiar();
-    }));
-    return { html, enlazar };
+    const op=[...(incluirTodos?[{cod:'todos',nombre:'Toda la jurisdicción CCMA'}]:[]),...MUNI];
+    return {html:`<label class="filtro"><span>Municipio</span><select class="select municipio-select" data-municipio aria-label="Municipio">${op.map(m=>`<option value="${m.cod}" ${estado.municipio===m.cod?'selected':''}>${m.nombre}</option>`).join('')}</select></label>`,enlazar:raiz=>$$('[data-municipio]',raiz).forEach(el=>el.addEventListener('change',()=>{estado.municipio=el.value;alCambiar()}))};
   }
   function descargarCSV(nombre, filas) {
     if (!filas.length) return;
     const cols = Object.keys(filas[0]);
+    const segura = v => /^[=+@\-\t\r]/.test(String(v ?? "")) ? "\'" + v : v;
     const txt = [cols.join(";"), ...filas.map(f => cols.map(c => {
-      const v = f[c]; return typeof v === "number" ? String(v).replace(".", ",") : `"${String(v ?? "").replace(/"/g, '""')}"`;
+      const v = f[c]; return typeof v === "number" ? String(v).replace(".", ",") : `"${String(segura(v) ?? "").replace(/"/g, '""')}"`;
     }).join(";"))].join("\r\n");
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob(["﻿" + txt], { type: "text/csv;charset=utf-8" }));
@@ -195,15 +189,16 @@
   }
 
   function iniciar() {
-    try { const g = localStorage.getItem("ccas-tema"); if (g) aplicarTema(g); } catch (e) { /* nada */ }
+    try { const g = localStorage.getItem("ccma-tema"); aplicarTema(g || "light"); } catch (e) { aplicarTema("light"); }
     $("#pieFecha").textContent = `Datos procesados: ${D.meta.generado}`;
     $$(".selector-tablero button").forEach(b => b.addEventListener("click", () => ir(b.dataset.tablero)));
     $("#btnTema").addEventListener("click", () => { aplicarTema(temaActual() === "dark" ? "light" : "dark"); rerender(); });
     matchMedia("(prefers-color-scheme: dark)").addEventListener("change", rerender);
     let to; window.addEventListener("resize", () => { clearTimeout(to); to = setTimeout(() => graficos.forEach(g => g.resize()), 120); });
-    echarts.registerMap("aburra", window.GEO_ABURRA_SUR);
+    echarts.registerMap("ccma", window.GEO_CCMA);
     const [tb, sec] = location.hash.replace("#", "").split("/");
     ir(tableros[tb] ? tb : "observatorio", sec);
+    window.addEventListener("hashchange", () => {const [b,s]=location.hash.slice(1).split("/");if(tableros[b]) ir(b,s);});
   }
 
   window.App = {

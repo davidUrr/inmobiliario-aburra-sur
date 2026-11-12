@@ -52,7 +52,7 @@
 
   // ------------------------------------------------------------ índice de salud (fórmula Tablero Lonja)
   function componentesSalud(x) {
-    const roe = x.patrimonio ? (x.utilidad || 0) / x.patrimonio : 0;
+    const roe = x.patrimonio > 0 && x.utilidad != null ? x.utilidad / x.patrimonio : 0;
     const end = x.activos ? (x.pasivos || 0) / x.activos : 0;
     const liq = x.liquidez ?? 0, m = x.margen_neto ?? 0;
     return [
@@ -72,17 +72,17 @@
     const medMargen = est.mediana(lista.map(p => p.anios[a].margen_neto));
     if (x.liquidez != null && x.liquidez < 1)
       out.push({ tipo: "critico", t: "Liquidez insuficiente", d: `Activos corrientes cubren ${fmt.n(x.liquidez, 2)} veces las deudas de corto plazo (umbral: 1,0).`,
-        ruta: "Consultorio Empresarial Personalizado · finanzas, costos y flujo de caja" });
+        ruta: "Ruta de finanzas y flujo de caja · validar oferta vigente con un asesor CCMA" });
     if (x.deuda_activos != null && x.deuda_activos > 70)
       out.push({ tipo: "alerta", t: "Endeudamiento alto", d: `La deuda equivale al ${fmt.pct(x.deuda_activos, 0)} de los activos.`,
-        ruta: "EMFORMA · fortalecimiento financiero y estructura de capital" });
+        ruta: "Conexión Financiera · verificar requisitos y disponibilidad con CCMA" });
     if (x.margen_neto != null && (x.margen_neto < 0 || x.margen_neto < medMargen))
       out.push({ tipo: x.margen_neto < 0 ? "critico" : "alerta", t: x.margen_neto < 0 ? "Operación con pérdidas" : "Margen inferior a sus pares",
         d: `Margen neto de ${fmt.pct(x.margen_neto, 1)} frente a una mediana de ${fmt.pct(medMargen, 1)} en sus pares.`,
-        ruta: "Centro de Excelencia Operacional · productividad y costos" });
+        ruta: "Fábricas de Productividad y Sostenibilidad · validar pertinencia y convocatoria" });
     if (crec != null && crec < -10)
       out.push({ tipo: "alerta", t: "Caída de ingresos", d: `Los ingresos bajaron ${fmt.pct(-crec, 1)} frente al año anterior.`,
-        ruta: "Transformación Digital · canales comerciales y presencia digital" });
+        ruta: "Ruta comercial y digital · validar alternativas del portafolio CCMA" });
     if (x.score >= 80) out.push({ tipo: "ok", t: "Salud financiera excelente", d: `Índice de ${fmt.n(x.score, 0)}/100.`, ruta: "Candidata a caso de referencia y encadenamientos" });
     const roaP = pc("roa");
     if (roaP != null && roaP >= 75) out.push({ tipo: "ok", t: "Rentabilidad del activo en el cuartil superior", d: `Supera al ${fmt.n(roaP, 0)} % de sus pares.` });
@@ -114,8 +114,9 @@
     const a = anioSel && anios.includes(anioSel) ? anioSel : anios.at(-1);
     const x = e.anios[a], ap = String(+a - 1), k = t();
     const { lista, desc } = pares(e, a);
-    const comps = componentesSalud(x), score = x.score ?? est.suma(comps.map(c => c.v));
-    const nivel = x.nivel || (score >= 80 ? "Excelente" : score >= 60 ? "Buena" : score >= 40 ? "Regular" : "Deficiente");
+    const score = x.score ?? null;
+    const comps = componentesSalud(x).map(c => score == null ? {...c,v:null,d:'Sin componentes completos'} : c);
+    const nivel = x.nivel || "Sin datos completos";
 
     vista.insertAdjacentHTML("beforeend", `
       <div class="seccion-titulo"><div><h2>Radiografía de la empresa</h2>
@@ -125,6 +126,8 @@
           <button class="btn sec no-print" id="btnComparar">Añadir al comparador</button>
           <button class="btn no-print" id="btnPdf">Imprimir ficha</button></div></div>
       <div class="grid">
+        ${x.conflictos?.length ? `<div class="c12 nota" role="alert">▲ Valores contradictorios en la fuente: ${x.conflictos.map(esc).join(", ")}. Se muestran sin dato.</div>` : ""}
+        ${score==null?`<div class="c12 nota">Índice no calculado: faltan componentes financieros. Las señales disponibles se muestran por separado.</div>`:""}
         ${x.atipico ? `<div class="c12 nota" role="alert"><span class="badge alerta">▲ Dato atípico</span> ${esc(x.atipico)}. Este año se excluye de agregados, rankings y comparaciones con pares.</div>` : ""}
         <section class="card c12 ficha">
           <div><h2>${esc(e.nombre)}</h2>
@@ -139,15 +142,15 @@
             <div class="componentes">${comps.map(c => `<div class="componente"><span>${c.n}</span>
               <div class="barra" title="${c.d}"><i style="width:${c.v / c.max * 100}%"></i></div><span class="num">${fmt.n(c.v, 0)}/${c.max}</span></div>`).join("")}
             </div></div>
-          <p class="fuente">Rentabilidad 30 · liquidez 25 · endeudamiento 25 · margen 20 (fórmula del Tablero Lonja).</p></section>
+          <p class="fuente">Rentabilidad 30 · liquidez 25 · endeudamiento 25 · margen 20 (modelo ilustrativo; no es un diagnóstico oficial).</p></section>
         <div class="c8 grid kpi-par">
           ${kpi({ etq: `Ingresos ${a}`, valor: fmt.cop(x.ingresos), contexto: fmt.delta(x.ingresos, e.anios[ap]?.ingresos), cls: "" })}
           ${kpi({ etq: "Utilidad neta", valor: fmt.cop(x.utilidad), contexto: `Margen neto ${fmt.pct(x.margen_neto, 1)}`, cls: "" })}
           ${kpi({ etq: "Activos totales", valor: fmt.cop(x.activos), contexto: `Patrimonio ${fmt.cop(x.patrimonio)}`, cls: "" })}
-          ${kpi({ etq: "Participación en los ingresos del sector", valor: fmt.pct((x.cuota || 0) * 100, 2), contexto: `Puesto ${[...D.empresas].filter(z => conDatos(z, a)).sort((p, q) => q.anios[a].ingresos - p.anios[a].ingresos).findIndex(z => z.nit === e.nit) + 1} de ${D.empresas.filter(z => conDatos(z, a)).length} en Aburrá Sur`, cls: "" })}
+          ${kpi({ etq: "Participación en los ingresos de la muestra", valor: fmt.pct(x.cuota==null?null:x.cuota*100,2), contexto: `Puesto ${[...D.empresas].filter(z => conDatos(z, a)).sort((p, q) => q.anios[a].ingresos - p.anios[a].ingresos).findIndex(z => z.nit === e.nit) + 1} de ${D.empresas.filter(z => conDatos(z, a)).length} en la muestra CCMA`, cls: "" })}
         </div>
         ${card({ id: "pos", titulo: "Posición frente a sus pares", sub: "Percentil: 100 = mejor del grupo. Las marcas indican P25, mediana y P75.", fuente: F.emis, cls: "c7", cuerpo: `<div class="pct-lista" id="pctLista"></div>` })}
-        ${card({ id: "diag", titulo: "Diagnóstico automático y ruta sugerida", sub: "Reglas explicables; la ruta es ilustrativa y se basa en la oferta pública de la Cámara", cls: "c5", cuerpo: `<div class="diag" id="diagLista"></div>` })}
+        ${card({ id: "diag", titulo: "Señales financieras y ruta sugerida", sub: "Reglas explicables; orientación ilustrativa; el asesor valida el diagnóstico, la elegibilidad y la oferta vigente", cls: "c5", cuerpo: `<div class="diag" id="diagLista"></div>` })}
         ${["ingresos", "margen_neto", "roa", "deuda_activos"].map(c => card({ id: `tr-${c}`, titulo: IND.find(i => i.k === c).n, cls: "c3", alto: "bajo" })).join("")}
         <div class="c12">${leyenda([{ nombre: "Empresa", color: k.series[0], linea: true }, { nombre: "Mediana de pares", color: k.ref, linea: true, ref: true }, { nombre: "Rango P25–P75 de pares", color: k.grid }])}</div>
         <details class="card c12"><summary><b>Cómo leer esta ficha</b></summary>
@@ -174,7 +177,7 @@
     grafico($("#anillo"), { series: [{ type: "gauge", startAngle: 90, endAngle: -270, min: 0, max: 100, radius: "100%",
       pointer: { show: false }, progress: { show: true, roundCap: true, width: 12, itemStyle: { color: k.series[0] } },
       axisLine: { lineStyle: { width: 12, color: [[1, k.grid]] } }, splitLine: { show: false }, axisTick: { show: false }, axisLabel: { show: false },
-      detail: { valueAnimation: false, offsetCenter: [0, 0], fontSize: 28, fontWeight: 800, fontFamily: k.fontT, color: k.text, formatter: v => fmt.n(v, 0) },
+      detail: { valueAnimation: false, offsetCenter: [0, 0], fontSize: 28, fontWeight: 800, fontFamily: k.fontT, color: k.text, formatter: v => score == null ? 'Sin datos' : fmt.n(v, 0) },
       title: { show: false }, data: [{ value: score }] }] });
 
     // posición percentil
